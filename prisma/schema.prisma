@@ -1,0 +1,41 @@
+// generator and datasource settings same rahengi
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // Admin ya User identify karne ke liye
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationship: Ek user ke multiple issues ho sakte hain.
+  // Yeh line existing functionality ko maintain rakhti hai.
+  issues    Issue[]
+}
+
+model Issue {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  
+  // Status: Default "OPEN" hai. Admin panel isse "IN_PROGRESS" ya "COMPLETED" mein update karega.
+  status      String   @default("OPEN") 
+  
+  createdAt   DateTime @default(now())
+
+  // Foreign Key: Yeh store karti hai ke kis user ne issue create kiya.
+  userId      String?
+  
+  // Relation: Yeh admin panel ko allow karega ke jab hum Issue fetch karein 
+  // toh saath mein User ka Name aur Email bhi mil jaye (Using 'include' in Prisma).
+  user        User?    @relation(fields: [userId], references: [id])
+}
