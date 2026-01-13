@@ -12,6 +12,7 @@ interface Issue {
   userId: string;
   user: {
     name: string;
+
     email: string;
   };
 }
